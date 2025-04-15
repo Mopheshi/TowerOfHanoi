@@ -28,7 +28,7 @@ class StatsPanel extends ConsumerWidget {
               color: Colors.blue,
             ),
             _buildStatItem(
-              label: 'Minimum',
+              label: 'Min Moves',
               value: '${gameState.minimumMoves}',
               icon: Icons.trending_down_rounded,
               color: Colors.green,
