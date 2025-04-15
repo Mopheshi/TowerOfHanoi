@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Tower of Hanoi</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #282c34;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    
+    #game-container {
+      position: relative;
+      width: 800px;
+      height: 500px;
+      background-color: #3a404e;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    #game-title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #61dafb;
+    }
+    
+    #game-board {
+      position: relative;
+      display: flex;
+      justify-content: space-around;
+      height: 350px;
+      width: 100%;
+    }
+    
+    .tower {
+      position: relative;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      width: 250px;
+      cursor: pointer;
+    }
+    
+    .tower-base {
+      width: 160px;
+      height: 20px;
+      background-color: #8c6a4b;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    
+    .tower-rod {
+      position: absolute;
+      bottom: 20px;
+      width: 20px;
+      height: 300px;
+      background-color: #8c6a4b;
+      border-radius: 10px 10px 0 0;
+      z-index: 1;
+    }
+    
+    .disk {
+      height: 30px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 5px;
+      transition: transform 0.3s ease-out;
+      z-index: 2;
+      box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .disk.selected {
+      transform: translateY(-20px);
+      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    #controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    #disk-count {
+      display: flex;
+      align-items: center;
+    }
+    
+    #disk-count button {
+      background-color: #61dafb;
+      border: none;
+      color: #282c34;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin: 0 10px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #disk-count button:disabled {
+      background-color: #3c5a66;
+      cursor: not-allowed;
+    }
+    
+    #game-controls button {
+      background-color: #61dafb;
+      border: none;
+      color: #282c34;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    #stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    .message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(40, 44, 52, 0.9);
+      padding: 20px 40px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #61dafb;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="game-title">Tower of Hanoi</div>
+    
+    <div id="game-board">
+      <div class="tower" id="tower1">
+        <div class="tower-rod"></div>
+        <div class="tower-base"></div>
+      </div>
+      <div class="tower" id="tower2">
+        <div class="tower-rod"></div>
+        <div class="tower-base"></div>
+      </div>
+      <div class="tower" id="tower3">
+        <div class="tower-rod"></div>
+        <div class="tower-base"></div>
+      </div>
+    </div>
+    
+    <div id="controls">
+      <div id="disk-count">
+        <span>Disks:</span>
+        <button id="decrease-disks">-</button>
+        <span id="disk-number">3</span>
+        <button id="increase-disks">+</button>
+      </div>
+      
+      <div id="game-controls">
+        <button id="reset-btn">Reset</button>
+        <button id="solve-btn">Auto Solve</button>
+      </div>
+    </div>
+    
+    <div id="stats">
+      <div id="moves">Moves: 0</div>
+      <div id="min-moves">Minimum Moves: 7</div>
+      <div id="timer">Time: 00:00</div>
+    </div>
+    
+    <div id="win-message" class="message">
+      Congratulations! You solved it!
+      <br><br>
+      <button id="play-again-btn">Play Again</button>
+    </div>
+  </div>
+  
+  <script>
+    // Game variables
+    const towers = [
+      document.getElementById('tower1'),
+      document.getElementById('tower2'),
+      document.getElementById('tower3')
+    ];
+    
+    let disks = 3;
+    let maxDisks = 7;
+    let minDisks = 1;
+    let selectedDisk = null;
+    let selectedTower = null;
+    let moves = 0;
+    let timerInterval = null;
+    let seconds = 0;
+    let gameStarted = false;
+    let solving = false;
+    let solveMoves = [];
+    let solveInterval = null;
+    
+    // Colors for the disks
+    const diskColors = [
+      '#FF5252', // Red
+      '#FF9800', // Orange
+      '#FFEB3B', // Yellow
+      '#4CAF50', // Green
+      '#2196F3', // Blue
+      '#9C27B0', // Purple
+      '#795548'  // Brown
+    ];
+    
+    // Initialize the game
+    function initGame() {
+      // Clear all towers
+      towers.forEach(tower => {
+        const disksElements = tower.querySelectorAll('.disk');
+        disksElements.forEach(disk => disk.remove());
+      });
+      
+      // Add disks to the first tower
+      for (let i = disks; i > 0; i--) {
+        const diskElement = document.createElement('div');
+        diskElement.className = 'disk';
+        diskElement.dataset.size = i;
+
+        // Calculate width based on disk size (smallest disk is 60px, each larger disk adds 15px)
+        const width = 60 + (i - 1) * 15;
+        diskElement.style.width = width + 'px';
+        diskElement.style.backgroundColor = diskColors[i - 1];
+
+        towers[0].appendChild(diskElement);
+      }
+      
+      // Reset game stats
+      moves = 0;
+      document.getElementById('moves').textContent = 'Moves: 0';
+      
+      // Calculate and display minimum moves
+      const minMoves = Math.pow(2, disks) - 1;
+      document.getElementById('min-moves').textContent = `Minimum Moves: ${minMoves}`;
+      
+      // Reset timer
+      clearInterval(timerInterval);
+      seconds = 0;
+      document.getElementById('timer').textContent = 'Time: 00:00';
+      
+      // Reset game state
+      selectedDisk = null;
+      selectedTower = null;
+      gameStarted = false;
+      
+      // Hide win message
+      document.getElementById('win-message').style.display = 'none';
+      
+      // Stop auto-solving if in progress
+      if (solveInterval) {
+        clearInterval(solveInterval);
+        solveInterval = null;
+      }
+      solving = false;
+    }
+    
+    // Format time as MM:SS
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    // Check if the game is won
+    function checkWin() {
+      // Game is won if all disks are on tower 2 or 3 in correct order
+      const winTower = towers[1].querySelectorAll('.disk').length === disks ||
+                       towers[2].querySelectorAll('.disk').length === disks;
+      
+      if (winTower && !solving) {
+        // Stop the timer
+        clearInterval(timerInterval);
+        
+        // Show win message
+        document.getElementById('win-message').style.display = 'block';
+      }
+      
+      return winTower;
+    }
+    
+    // Get the top disk from a tower
+    function getTopDisk(tower) {
+      const disksOnTower = tower.querySelectorAll('.disk');
+      return disksOnTower.length > 0 ? disksOnTower[disksOnTower.length - 1] : null;
+    }
+    
+    // Check if a move is valid
+    function isValidMove(fromTower, toTower) {
+      const topDiskFrom = getTopDisk(fromTower);
+      const topDiskTo = getTopDisk(toTower);
+      
+      if (!topDiskFrom) return false;
+      
+      if (!topDiskTo) return true;
+      
+      return parseInt(topDiskFrom.dataset.size) < parseInt(topDiskTo.dataset.size);
+    }
+    
+    // Handle tower click
+    function handleTowerClick(towerIndex) {
+      if (solving) return;
+      
+      const tower = towers[towerIndex];
+      
+      // Start the timer on first move
+      if (!gameStarted) {
+        gameStarted = true;
+        timerInterval = setInterval(() => {
+          seconds++;
+          document.getElementById('timer').textContent = `Time: ${formatTime(seconds)}`;
+        }, 1000);
+      }
+      
+      // If no disk is selected, try to select one
+      if (!selectedDisk) {
+        const topDisk = getTopDisk(tower);
+        if (topDisk) {
+          selectedDisk = topDisk;
+          selectedDisk.classList.add('selected');
+          selectedTower = tower;
+        }
+      }
+      // If a disk is already selected, try to move it
+      else {
+        // If clicking the same tower, deselect the disk
+        if (tower === selectedTower) {
+          selectedDisk.classList.remove('selected');
+          selectedDisk = null;
+          selectedTower = null;
+          return;
+        }
+        
+        // Check if the move is valid
+        if (isValidMove(selectedTower, tower)) {
+          // Remove selected class
+          selectedDisk.classList.remove('selected');
+          
+          // Move the disk to the new tower
+          selectedTower.removeChild(selectedDisk);
+          tower.appendChild(selectedDisk);
+          
+          // Update moves counter
+          moves++;
+          document.getElementById('moves').textContent = `Moves: ${moves}`;
+          
+          // Check if the game is won
+          checkWin();
+        }
+        
+        // Reset selection
+        selectedDisk = null;
+        selectedTower = null;
+      }
+    }
+    
+    // Recursive function to solve Tower of Hanoi
+    function generateSolveMoves(n, source, auxiliary, target) {
+      if (n > 0) {
+        generateSolveMoves(n - 1, source, target, auxiliary);
+        solveMoves.push([source, target]);
+        generateSolveMoves(n - 1, auxiliary, source, target);
+      }
+    }
+    
+    // Auto-solve the game
+    function autoSolve() {
+      if (solving) return;
+      
+      // Reset the game if it's already won
+      if (checkWin()) {
+        initGame();
+      }
+      
+      // Generate solution moves
+      solveMoves = [];
+      generateSolveMoves(disks, 0, 1, 2);
+      
+      // Start auto-solving
+      solving = true;
+      let moveIndex = 0;
+      
+      // Reset moves counter
+      moves = 0;
+      document.getElementById('moves').textContent = 'Moves: 0';
+      
+      // Reset timer
+      clearInterval(timerInterval);
+      seconds = 0;
+      document.getElementById('timer').textContent = 'Time: 00:00';
+      timerInterval = setInterval(() => {
+        seconds++;
+        document.getElementById('timer').textContent = `Time: ${formatTime(seconds)}`;
+      }, 1000);
+      
+      // Execute moves with animation
+      solveInterval = setInterval(() => {
+        if (moveIndex >= solveMoves.length) {
+          clearInterval(solveInterval);
+          solving = false;
+          solveInterval = null;
+          return;
+        }
+        
+        const [fromIndex, toIndex] = solveMoves[moveIndex];
+        const fromTower = towers[fromIndex];
+        const toTower = towers[toIndex];
+        
+        const topDisk = getTopDisk(fromTower);
+        if (topDisk && isValidMove(fromTower, toTower)) {
+          fromTower.removeChild(topDisk);
+          toTower.appendChild(topDisk);
+          
+          moves++;
+          document.getElementById('moves').textContent = `Moves: ${moves}`;
+          
+          checkWin();
+        }
+        
+        moveIndex++;
+      }, 500); // Move every 500ms
+    }
+    
+    // Add event listeners
+    towers.forEach((tower, index) => {
+      tower.addEventListener('click', () => handleTowerClick(index));
+    });
+    
+    document.getElementById('reset-btn').addEventListener('click', initGame);
+    document.getElementById('solve-btn').addEventListener('click', autoSolve);
+    document.getElementById('play-again-btn').addEventListener('click', initGame);
+    
+    // Disk count controls
+    document.getElementById('increase-disks').addEventListener('click', () => {
+      if (disks < maxDisks) {
+        disks++;
+        document.getElementById('disk-number').textContent = disks;
+        initGame();
+        
+        // Enable decrease button if needed
+        document.getElementById('decrease-disks').disabled = false;
+        
+        // Disable increase button if at max
+        if (disks === maxDisks) {
+          document.getElementById('increase-disks').disabled = true;
+        }
+      }
+    });
+    
+    document.getElementById('decrease-disks').addEventListener('click', () => {
+      if (disks > minDisks) {
+        disks--;
+        document.getElementById('disk-number').textContent = disks;
+        initGame();
+        
+        // Enable increase button if needed
+        document.getElementById('increase-disks').disabled = false;
+        
+        // Disable decrease button if at min
+        if (disks === minDisks) {
+          document.getElementById('decrease-disks').disabled = true;
+        }
+      }
+    });
+    
+    // Initialize the game
+    initGame();
+  </script>
+</body>
+</html>
