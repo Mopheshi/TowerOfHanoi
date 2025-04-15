@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'colours.dart';
 
 // Theme configuration
@@ -12,5 +12,5 @@ final ThemeData appTheme = ThemeData(
     surfaceBright: Colours.surfaceBrightColor,
   ),
   useMaterial3: true,
-  fontFamily: 'Montserrat',
+  textTheme: GoogleFonts.bungeeSpiceTextTheme(),
 );

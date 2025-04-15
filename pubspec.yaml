@@ -16,6 +16,7 @@ dependencies:
 
   audioplayers: ^6.4.0
   flutter_riverpod: ^2.6.1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
