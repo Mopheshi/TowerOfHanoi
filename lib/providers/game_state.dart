@@ -9,6 +9,7 @@ class GameState {
   final bool isPlaying;
   final bool isAutoSolving;
   final bool hasWon;
+  final bool isMusicPlaying;
 
   const GameState({
     required this.towers,
@@ -19,6 +20,7 @@ class GameState {
     this.isPlaying = false,
     this.isAutoSolving = false,
     this.hasWon = false,
+    this.isMusicPlaying = false,
   });
 
   GameState copyWith({
@@ -30,6 +32,7 @@ class GameState {
     bool? isPlaying,
     bool? isAutoSolving,
     bool? hasWon,
+    bool? isMusicPlaying,
   }) {
     return GameState(
       towers: towers ?? this.towers,
@@ -40,6 +43,7 @@ class GameState {
       isPlaying: isPlaying ?? this.isPlaying,
       isAutoSolving: isAutoSolving ?? this.isAutoSolving,
       hasWon: hasWon ?? this.hasWon,
+      isMusicPlaying: isMusicPlaying ?? this.isMusicPlaying,
     );
   }
 

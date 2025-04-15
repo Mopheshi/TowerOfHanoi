@@ -60,7 +60,12 @@ class GameNotifier extends StateNotifier<GameState> {
     _solveMoves = [];
     _currentSolveMove = 0;
 
-    state = GameState(towers: towers, diskCount: diskCount);
+    // state = GameState(towers: towers, diskCount: diskCount);
+    state = GameState(
+      towers: towers,
+      diskCount: diskCount,
+      isMusicPlaying: GameAudioPlayer.isBackgroundMusicPlaying,
+    );
   }
 
   /// Handles the selection of a tower and the movement of disks.
@@ -115,7 +120,19 @@ class GameNotifier extends StateNotifier<GameState> {
       newTowers[fromTowerId] = newTowers[fromTowerId].removeDisk();
       newTowers[toTowerId] = newTowers[toTowerId].addDisk(disk);
       GameAudioPlayer.playEffect(GameSounds.move);
-      state = state.copyWith(towers: newTowers, moves: state.moves + 1);
+
+      // Check if the game was not already playing
+      bool wasPlaying = state.isPlaying;
+      state = state.copyWith(
+        towers: newTowers,
+        moves: state.moves + 1,
+        isPlaying: true,
+      );
+
+      if (!wasPlaying) {
+        _startTimer();
+      }
+
       // Delay clearing selection
       Timer(
         const Duration(milliseconds: 300),
@@ -171,6 +188,20 @@ class GameNotifier extends StateNotifier<GameState> {
   void resetGame() {
     GameAudioPlayer.playEffect(GameSounds.reset);
     _initializeGame(state.diskCount);
+  }
+
+  /// Toggles the background music state.
+  ///
+  /// This method updates the game state to reflect the desired music
+  /// playback status.
+  ///
+  /// **Parameters:**
+  /// - [playMusic]: Whether music should be playing after this toggle.
+  ///
+  /// **Side Effects:**
+  /// - Updates the isMusicPlaying property in the game state.
+  void toggleMusicState([bool? playMusic]) {
+    state = state.copyWith(isMusicPlaying: playMusic ?? !state.isMusicPlaying);
   }
 
   /// Initiates the auto-solving feature to solve the puzzle automatically.
