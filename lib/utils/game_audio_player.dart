@@ -53,7 +53,7 @@ class GameAudioPlayer {
             stayAwake: true,
             contentType: AndroidContentType.music,
             usageType: AndroidUsageType.game,
-            audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+            audioFocus: AndroidAudioFocus.none, // Changed to none
           ),
           iOS: AudioContextIOS(
             category: AVAudioSessionCategory.playback,
@@ -126,6 +126,16 @@ class GameAudioPlayer {
       ll('Error starting music: $e');
     }
   }
+
+  /// Returns whether background music is currently playing.
+  ///
+  /// This getter checks the current state of the music player to determine if
+  /// background music is actively playing.
+  ///
+  /// **Returns:**
+  /// - `true` if background music is playing, `false` otherwise.
+  static bool get isBackgroundMusicPlaying =>
+      _initialized && _musicPlayer.state == PlayerState.playing;
 
   static Future<void> stopBackgroundMusic() async {
     if (!_initialized) return;
