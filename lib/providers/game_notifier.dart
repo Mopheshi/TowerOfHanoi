@@ -14,6 +14,10 @@ class GameNotifier extends StateNotifier<GameState> {
 
   GameNotifier() : super(GameState(towers: [])) {
     _initializeGame(3);
+    // Start music by default and update state to match
+    GameAudioPlayer.playBackgroundMusic().then(
+      (_) => state = state.copyWith(isMusicPlaying: true),
+    );
   }
 
   /// Initializes the game with the specified number of disks.
@@ -60,12 +64,13 @@ class GameNotifier extends StateNotifier<GameState> {
     _solveMoves = [];
     _currentSolveMove = 0;
 
-    // state = GameState(towers: towers, diskCount: diskCount);
     state = GameState(
       towers: towers,
       diskCount: diskCount,
-      isMusicPlaying: GameAudioPlayer.isBackgroundMusicPlaying,
+      isMusicPlaying: true,
     );
+
+    if (state.isMusicPlaying) GameAudioPlayer.playBackgroundMusic();
   }
 
   /// Handles the selection of a tower and the movement of disks.
