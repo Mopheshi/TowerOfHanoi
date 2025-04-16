@@ -15,7 +15,6 @@ class TowerOfHanoi extends StatelessWidget {
 
     return MaterialApp(
       title: appName,
-      debugShowCheckedModeBanner: false,
       theme: appTheme,
       home: const GameScreen(),
     );
