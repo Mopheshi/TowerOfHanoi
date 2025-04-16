@@ -33,14 +33,16 @@ class GameAudioPlayer {
 
       // Create audio players for each sound
       ll("Creating sound players");
-      for (final entry in _soundPaths.entries) {
-        ll("Creating player for: ${entry.key}");
-        final player = AudioPlayer();
-        await player.setAsset(entry.value);
-        await player.setVolume(1.0);
-        _soundPlayers[entry.key] = player;
-        ll("Created player for: ${entry.key}");
-      }
+      await Future.wait(
+        _soundPaths.entries.map((entry) async {
+          ll("Creating player for: ${entry.key}");
+          _soundPlayers[entry.key] =
+              AudioPlayer()
+                ..setAsset(entry.value)
+                ..setVolume(1.0);
+          ll("Created player for: ${entry.key}");
+        }),
+      );
 
       _initialized = true;
       ll("Audio initialization complete");
@@ -66,14 +68,17 @@ class GameAudioPlayer {
   static void playEffect(GameSounds sound) {
     try {
       final player = _soundPlayers[sound];
-      if (player != null) {
-        player.seek(Duration.zero);
-        player.play();
-      }
+      player?.seek(Duration.zero).then((_) => player.play());
       ll("Playing sound: $sound");
     } catch (e) {
       ll("Failed to play sound effect: $e");
     }
+  }
+
+  /// Pause music
+  static Future<void> pauseBackgroundMusic() async {
+    await _musicPlayer.pause();
+    ll("Background music paused");
   }
 
   /// Stop music
@@ -84,9 +89,7 @@ class GameAudioPlayer {
 
   static Future<void> dispose() async {
     await _musicPlayer.dispose();
-    for (final player in _soundPlayers.values) {
-      await player.dispose();
-    }
+    await Future.wait(_soundPlayers.values.map((player) => player.dispose()));
     _soundPlayers.clear();
     _initialized = false;
     ll("Audio disposed");

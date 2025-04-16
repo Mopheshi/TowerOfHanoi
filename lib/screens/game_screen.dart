@@ -79,7 +79,7 @@ class GameScreen extends ConsumerWidget {
               if (newMusicState) {
                 GameAudioPlayer.playBackgroundMusic();
               } else {
-                GameAudioPlayer.stopBackgroundMusic();
+                GameAudioPlayer.pauseBackgroundMusic();
               }
             },
           ),
