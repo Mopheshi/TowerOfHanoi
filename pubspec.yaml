@@ -14,9 +14,10 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-  audioplayers: ^6.4.0
   flutter_riverpod: ^2.6.1
   google_fonts: ^6.2.1
+  just_audio: ^0.10.0
+  audio_session: ^0.2.0
 
 dev_dependencies:
   flutter_test:

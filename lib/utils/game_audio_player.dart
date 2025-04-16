@@ -1,167 +1,94 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'package:audio_session/audio_session.dart';
+import 'package:just_audio/just_audio.dart';
 
-import 'utils.dart';
+import '../utils/utils.dart';
 
 class GameAudioPlayer {
-  static final AudioPlayer _effectPlayer = AudioPlayer();
   static final AudioPlayer _musicPlayer = AudioPlayer();
-  static final AudioCache _audioCache = AudioCache(
-    prefix: assetsPath + soundsPath,
-  );
-
-  static bool _musicWasPlaying = false;
-
-  static final Map<GameSounds, String> _sounds = {
-    GameSounds.select: 'select.mp3',
-    GameSounds.deselect: 'deselect.mp3',
-    GameSounds.move: 'move.mp3',
-    GameSounds.error: 'error.mp3',
-    GameSounds.win: 'win.mp3',
-    GameSounds.clap: 'clap.mp3',
-    GameSounds.reset: 'reset.mp3',
-    GameSounds.click: 'click.mp3',
-  };
+  static final Map<GameSounds, AudioPlayer> _soundPlayers = {};
 
   static bool _initialized = false;
 
-  /// Initializes the audio players and preloads sound files.
-  ///
-  /// This method prepares the audio system by setting up players for sound effects
-  /// and background music. It preloads all required sound files to ensure smooth
-  /// playback during gameplay.
-  ///
-  /// **Returns:**
-  /// - A [Future] that completes when initialization is done.
-  ///
-  /// **Side Effects:**
-  /// - Initializes audio players and caches sound files.
+  static final Map<GameSounds, String> _soundPaths = {
+    GameSounds.select: selectSound,
+    GameSounds.deselect: deselectSound,
+    GameSounds.move: moveSound,
+    GameSounds.error: errorSound,
+    GameSounds.win: winSound,
+    GameSounds.reset: resetSound,
+    GameSounds.click: clickSound,
+  };
+
+  /// Preload all sounds during initialization
   static Future<void> initialize() async {
     if (_initialized) return;
+    ll("Starting audio initialization");
 
     try {
-      // Preload all sound files
-      await _audioCache.loadAll(_sounds.values.toList());
+      // Configure audio session for mixing
+      ll("Configuring audio session");
+      final session = await AudioSession.instance;
+      await session.configure(const AudioSessionConfiguration.music());
+      ll("Audio session configured");
 
-      // Configure audio players
-      await _effectPlayer.setVolume(0.7);
-      await _musicPlayer.setVolume(0.4);
-      await _musicPlayer.setReleaseMode(ReleaseMode.loop);
-
-      // Set global audio context to allow mixing
-      await AudioPlayer.global.setAudioContext(
-        AudioContext(
-          android: AudioContextAndroid(
-            isSpeakerphoneOn: false,
-            stayAwake: true,
-            contentType: AndroidContentType.music,
-            usageType: AndroidUsageType.game,
-            audioFocus: AndroidAudioFocus.gain, // Changed from none
-          ),
-          iOS: AudioContextIOS(
-            category: AVAudioSessionCategory.playback,
-            options: {AVAudioSessionOptions.mixWithOthers},
-          ),
-        ),
-      );
+      // Create audio players for each sound
+      ll("Creating sound players");
+      for (final entry in _soundPaths.entries) {
+        ll("Creating player for: ${entry.key}");
+        final player = AudioPlayer();
+        await player.setAsset(entry.value);
+        await player.setVolume(1.0);
+        _soundPlayers[entry.key] = player;
+        ll("Created player for: ${entry.key}");
+      }
 
       _initialized = true;
-      ll('Audio initialized with ${_sounds.length} sounds preloaded');
+      ll("Audio initialization complete");
     } catch (e) {
-      ll('Audio initialization failed: $e');
+      ll("Audio initialization failed: $e");
+      _initialized = true; // Mark as initialized to avoid retries
     }
   }
 
-  /// Plays a specified sound effect.
-  ///
-  /// This method triggers the playback of a sound effect based on the provided
-  /// [sound] enum value. It leverages the preloaded audio cache for quick and
-  /// efficient playback.
-  ///
-  /// **Parameters:**
-  /// - [sound]: The [GameSounds] enum value representing the sound to play.
-  ///
-  /// **Returns:**
-  /// - A [Future] that completes when the sound starts playing.
-  static Future<void> playEffect(GameSounds sound) async {
-    if (!_initialized) return;
-
-    final fileName = _sounds[sound];
-    if (fileName == null) {
-      ll('Sound $sound not found');
-      return;
-    }
-
-    try {
-      final uri = await _audioCache.load(fileName);
-      // Don't stop the effect player, just play the new sound
-      await _effectPlayer.play(UrlSource(uri.path));
-      ll('Playing sound: $fileName');
-
-      // If music was playing and stopped, restart it after a short delay
-      if (!isBackgroundMusicPlaying && _musicWasPlaying) {
-        Future.delayed(const Duration(milliseconds: 100), () {
-          playBackgroundMusic();
-        });
-      }
-    } catch (e) {
-      ll('Error playing $sound: $e');
-    }
-  }
-
-  /// Starts playing the background music in a loop.
-  ///
-  /// This method begins playback of the background music if it is not already
-  /// playing, ensuring a continuous audio experience. The music loops indefinitely
-  /// until stopped.
-  ///
-  /// **Returns:**
-  /// - A [Future] that completes when the music starts playing.
-  ///
-  /// **Side Effects:**
-  /// - Starts the background music player in looping mode.
+  /// Play background music
   static Future<void> playBackgroundMusic() async {
-    if (!_initialized) return;
-
     try {
-      await _musicPlayer.setReleaseMode(ReleaseMode.loop);
-
-      // Only start if not already playing
-      if (_musicPlayer.state != PlayerState.playing) {
-        final uri = await _audioCache.load(backgroundMusic.split('/').last);
-        await _musicPlayer.play(UrlSource(uri.path));
-        _musicWasPlaying = true;
-        ll('Background music started');
-      }
+      await _musicPlayer.setAsset(backgroundMusic);
+      await _musicPlayer.setLoopMode(LoopMode.one);
+      await _musicPlayer.play();
+      ll("Background music started");
     } catch (e) {
-      ll('Error starting music: $e');
+      ll("Failed to play background music: $e");
     }
   }
 
-  /// Returns whether background music is currently playing.
-  ///
-  /// This getter checks the current state of the music player to determine if
-  /// background music is actively playing.
-  ///
-  /// **Returns:**
-  /// - `true` if background music is playing, `false` otherwise.
-  static bool get isBackgroundMusicPlaying =>
-      _initialized && _musicPlayer.state == PlayerState.playing;
-
-  static Future<void> stopBackgroundMusic() async {
-    if (!_initialized) return;
-
+  /// Play a sound effect
+  static void playEffect(GameSounds sound) {
     try {
-      _musicWasPlaying = false;
-      await _musicPlayer.stop();
-      ll('Background music stopped');
+      final player = _soundPlayers[sound];
+      if (player != null) {
+        player.seek(Duration.zero);
+        player.play();
+      }
+      ll("Playing sound: $sound");
     } catch (e) {
-      ll('Error stopping background music: $e');
+      ll("Failed to play sound effect: $e");
     }
+  }
+
+  /// Stop music
+  static Future<void> stopBackgroundMusic() async {
+    await _musicPlayer.stop();
+    ll("Background music stopped");
   }
 
   static Future<void> dispose() async {
-    await _effectPlayer.dispose();
     await _musicPlayer.dispose();
+    for (final player in _soundPlayers.values) {
+      await player.dispose();
+    }
+    _soundPlayers.clear();
     _initialized = false;
+    ll("Audio disposed");
   }
 }

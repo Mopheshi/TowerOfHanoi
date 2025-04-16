@@ -1,6 +1,8 @@
 const String appName = "Tower of Hanoi";
-const String assetsPath = "assets/";
-const String soundsPath = "sounds/";
+
+// const String assetsPath = "assets/";
+// const String soundsPath = "sounds/";
+const String soundsPath = "assets/sounds/";
 
 // Sound assets
 const String selectSound = "${soundsPath}select.mp3";

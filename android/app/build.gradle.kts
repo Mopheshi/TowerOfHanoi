@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "atachiz02.softwares.tower_of_hanoi"
-        minSdk = flutter.minSdkVersion
+        minSdk = 24                 // flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
