@@ -9,6 +9,8 @@ class GameAudioPlayer {
     prefix: assetsPath + soundsPath,
   );
 
+  static bool _musicWasPlaying = false;
+
   static final Map<GameSounds, String> _sounds = {
     GameSounds.select: 'select.mp3',
     GameSounds.deselect: 'deselect.mp3',
@@ -53,7 +55,7 @@ class GameAudioPlayer {
             stayAwake: true,
             contentType: AndroidContentType.music,
             usageType: AndroidUsageType.game,
-            audioFocus: AndroidAudioFocus.none, // Changed to none
+            audioFocus: AndroidAudioFocus.gain, // Changed from none
           ),
           iOS: AudioContextIOS(
             category: AVAudioSessionCategory.playback,
@@ -91,9 +93,16 @@ class GameAudioPlayer {
 
     try {
       final uri = await _audioCache.load(fileName);
-      // await _effectPlayer.stop(); // Optional
+      // Don't stop the effect player, just play the new sound
       await _effectPlayer.play(UrlSource(uri.path));
       ll('Playing sound: $fileName');
+
+      // If music was playing and stopped, restart it after a short delay
+      if (!isBackgroundMusicPlaying && _musicWasPlaying) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          playBackgroundMusic();
+        });
+      }
     } catch (e) {
       ll('Error playing $sound: $e');
     }
@@ -120,6 +129,7 @@ class GameAudioPlayer {
       if (_musicPlayer.state != PlayerState.playing) {
         final uri = await _audioCache.load(backgroundMusic.split('/').last);
         await _musicPlayer.play(UrlSource(uri.path));
+        _musicWasPlaying = true;
         ll('Background music started');
       }
     } catch (e) {
@@ -141,6 +151,7 @@ class GameAudioPlayer {
     if (!_initialized) return;
 
     try {
+      _musicWasPlaying = false;
       await _musicPlayer.stop();
       ll('Background music stopped');
     } catch (e) {
