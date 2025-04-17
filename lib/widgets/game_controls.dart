@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/providers.dart';
-import '../utils/colours.dart';
-import '../utils/constants.dart';
+import '../utils/utils.dart';
 import 'widgets.dart';
 
 class GameControls extends ConsumerWidget {
@@ -14,12 +13,9 @@ class GameControls extends ConsumerWidget {
     final gameState = ref.watch(gameProvider);
     final gameNotifier = ref.read(gameProvider.notifier);
 
-    final isLandscape =
-        MediaQuery.of(context).size.width > MediaQuery.of(context).size.height;
-
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (isLandscape) {
+        if (MediaQuery.of(context).orientation == Orientation.landscape) {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -57,13 +53,14 @@ class GameControls extends ConsumerWidget {
         CircleButton(
           icon: Icons.remove_rounded,
           onPressed:
-              gameState.diskCount > minDiskCount
+              (gameState.diskCount > minDiskCount &&
+                      !gameState.isPlaying &&
+                      !gameState.isAutoSolving)
                   ? () => gameNotifier.changeDiskCount(gameState.diskCount - 1)
                   : null,
         ),
-        Container(
-          alignment: Alignment.center,
-          width: 40,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             '${gameState.diskCount}',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -72,7 +69,9 @@ class GameControls extends ConsumerWidget {
         CircleButton(
           icon: Icons.add_rounded,
           onPressed:
-              gameState.diskCount < maxDiskCount
+              (gameState.diskCount < maxDiskCount &&
+                      !gameState.isPlaying &&
+                      !gameState.isAutoSolving)
                   ? () => gameNotifier.changeDiskCount(gameState.diskCount + 1)
                   : null,
         ),

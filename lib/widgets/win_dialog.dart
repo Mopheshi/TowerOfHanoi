@@ -5,62 +5,102 @@ import '../providers/game_provider.dart';
 import '../utils/utils.dart';
 import 'action_button.dart';
 
-class WinDialog extends ConsumerWidget {
+class WinDialog extends ConsumerStatefulWidget {
   const WinDialog({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WinDialog> createState() => _WinDialogState();
+}
+
+class _WinDialogState extends ConsumerState<WinDialog>
+    with SingleTickerProviderStateMixin {
+  final delayDuration = const Duration(milliseconds: 300);
+  bool _isExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(delayDuration, () {
+      setState(() => _isExpanded = true);
+      Future.delayed(delayDuration, () => setState(() => _isExpanded = false));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      backgroundColor: Theme.of(context).colorScheme.surfaceBright,
+      backgroundColor: Colors.transparent,
       elevation: 20,
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.emoji_events, color: Colors.amber, size: 64),
-            const SizedBox(height: 16),
-            const Text(
-              'Congratulations!',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'You solved the puzzle!',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white.withAlpha(204),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildStatRow('Moves', '${gameState.moves}'),
-            _buildStatRow('Minimum Moves', '${gameState.minimumMoves}'),
-            _buildStatRow('Time', gameState.seconds.formatTime()),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ActionButton(
-                  icon: Icons.play_arrow,
-                  label: 'Play Again',
-                  backgroundColor: Colors.green,
-                  onPressed: () {
-                    GameAudioPlayer.playEffect(GameSounds.click);
-                    ref.read(gameProvider.notifier).resetGame();
-                    Navigator.of(context).pop();
-                  },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).colorScheme.surfaceBright,
+              Theme.of(context).colorScheme.surfaceDim,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedScale(
+                scale: _isExpanded ? 1.5 : 1.0,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOutBack,
+                child: Icon(
+                  Icons.emoji_events_rounded,
+                  color: Colors.amber,
+                  size: 64,
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Congratulations!',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You solved the puzzle!',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white.withAlpha(204),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildStatRow('Moves', '${gameState.moves}'),
+              _buildStatRow('Minimum Moves', '${gameState.minimumMoves}'),
+              _buildStatRow('Time', gameState.seconds.formatTime()),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ActionButton(
+                    icon: Icons.play_arrow,
+                    label: 'Play Again',
+                    backgroundColor: Colors.green,
+                    onPressed: () {
+                      GameAudioPlayer.playEffect(GameSounds.click);
+                      ref.read(gameProvider.notifier).resetGame();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

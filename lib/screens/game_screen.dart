@@ -25,8 +25,6 @@ class GameScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameProvider);
-    final size = MediaQuery.of(context).size;
-    final isLandscape = size.width > size.height;
 
     // Show win dialog if game is won
     if (gameState.hasWon) {
@@ -87,7 +85,7 @@ class GameScreen extends ConsumerWidget {
       ),
       body: SafeArea(
         child:
-            isLandscape
+            MediaQuery.of(context).orientation == Orientation.landscape
                 ? _buildLandscapeLayout(context)
                 : _buildPortraitLayout(context),
       ),
