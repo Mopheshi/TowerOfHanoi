@@ -12,6 +12,7 @@ const String errorSound = "${soundsPath}error.mp3";
 const String winSound = "${soundsPath}win.mp3";
 const String resetSound = "${soundsPath}reset.mp3";
 const String clickSound = "${soundsPath}click.mp3";
+const String lostSound = "${soundsPath}lost.mp3";
 const String backgroundMusic = "${soundsPath}background_music.mp3";
 
 // Constants

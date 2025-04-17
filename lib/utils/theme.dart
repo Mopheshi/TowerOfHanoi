@@ -12,5 +12,5 @@ final ThemeData appTheme = ThemeData(
     surfaceBright: Colours.surfaceBrightColor,
   ),
   useMaterial3: true,
-  textTheme: GoogleFonts.bungeeSpiceTextTheme(),
+  textTheme: GoogleFonts.rubikBubblesTextTheme(),
 );

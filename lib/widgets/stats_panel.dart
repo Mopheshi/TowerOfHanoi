@@ -11,6 +11,14 @@ class StatsPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameProvider);
 
+    // Determine color for timer based on remaining time
+    final timeColor =
+        gameState.remainingTime < gameState.timeLimit * 0.25
+            ? Colors.red
+            : gameState.remainingTime < gameState.timeLimit * 0.5
+            ? Colors.orange
+            : Colors.green;
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -46,13 +54,13 @@ class StatsPanel extends ConsumerWidget {
               label: 'Min Moves',
               value: '${gameState.minimumMoves}',
               icon: Icons.trending_down_rounded,
-              color: Colors.green,
+              color: Colors.orange,
             ),
             _buildStatItem(
-              label: 'Time',
-              value: gameState.seconds.formatTime(),
-              icon: Icons.timer_rounded,
-              color: Colors.orange,
+              label: 'Time Left',
+              value: gameState.remainingTime.formatTime(),
+              icon: Icons.hourglass_bottom_rounded,
+              color: timeColor,
             ),
           ],
         ),
@@ -69,7 +77,12 @@ class StatsPanel extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color, size: 30),
+        TweenAnimationBuilder<Color?>(
+          tween: ColorTween(begin: Colors.transparent, end: color),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          builder: (context, animatedColor, child) => Icon(icon, color: animatedColor, size: 30),
+        ),
         const SizedBox(height: 4),
         Text(
           label,
@@ -80,8 +93,10 @@ class StatsPanel extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 2),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
           decoration: BoxDecoration(
             color: color.withAlpha(51),
             borderRadius: BorderRadius.circular(20),

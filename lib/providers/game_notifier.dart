@@ -7,13 +7,12 @@ import '../utils/utils.dart';
 import 'game_state.dart';
 
 class GameNotifier extends StateNotifier<GameState> {
-  Timer? _timer;
-  Timer? _autoSolveTimer;
+  Timer? _timer, _autoSolveTimer, _selectionTimer;
   List<List<int>> _solveMoves = [];
   int _currentSolveMove = 0;
 
   GameNotifier() : super(GameState(towers: [])) {
-    _initializeGame(3);
+    _initializeGame(minDiskCount);
     // Start music by default and update state to match
     GameAudioPlayer.playBackgroundMusic().then(
       (_) => state = state.copyWith(isMusicPlaying: true),
@@ -36,16 +35,8 @@ class GameNotifier extends StateNotifier<GameState> {
     final diskColors = Colours.diskColors;
 
     // Create towers
-    final towers = List.generate(3, (i) => Tower(id: i));
-
-    // Add disks to first tower
-    // for (int i = diskCount; i > 0; i--) {
-    //   final colorIndex = (i - 1) % diskColors.length;
-    //   towers[0] = towers[0].addDisk(
-    //     Disk(size: i, color: diskColors[colorIndex]),
-    //   );
-    // }
-    // Optimised adding logic
+    final towers = List.generate(minDiskCount, (i) => Tower(id: i));
+    // Add disks to the first tower
     towers[0] = towers[0].copyWith(
       disks: List.generate(diskCount, (index) {
         final size = diskCount - index;
@@ -64,13 +55,17 @@ class GameNotifier extends StateNotifier<GameState> {
     _solveMoves = [];
     _currentSolveMove = 0;
 
+    // Calculate appropriate time limit based on disk count
+    final timeLimit = GameState.calculateTimeLimit(diskCount);
+
     state = GameState(
       towers: towers,
       diskCount: diskCount,
-      isMusicPlaying: true,
+      isMusicPlaying: state.isMusicPlaying,
+      timeLimit: timeLimit,
     );
 
-    if (state.isMusicPlaying) GameAudioPlayer.playBackgroundMusic();
+    if (!state.isMusicPlaying) GameAudioPlayer.playBackgroundMusic();
   }
 
   /// Handles the selection of a tower and the movement of disks.
@@ -134,15 +129,15 @@ class GameNotifier extends StateNotifier<GameState> {
         isPlaying: true,
       );
 
-      if (!wasPlaying) {
-        _startTimer();
-      }
+      if (!wasPlaying) _startTimer();
 
-      // Delay clearing selection
-      Timer(
+      // Cancel any existing selection timer before starting a new one
+      _selectionTimer?.cancel();
+      _selectionTimer = Timer(
         const Duration(milliseconds: 300),
         () => state = state.copyWith(selectedTowerId: null),
       );
+
       _checkWin();
     } else {
       GameAudioPlayer.playEffect(GameSounds.error);
@@ -179,7 +174,15 @@ class GameNotifier extends StateNotifier<GameState> {
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      state = state.copyWith(seconds: state.seconds + 1);
+      final newSeconds = state.seconds + 1;
+
+      // Check if time has run out
+      if (newSeconds >= state.timeLimit && state.isPlaying && !state.hasWon) {
+        _handleGameOver();
+        return;
+      }
+
+      state = state.copyWith(seconds: newSeconds);
     });
   }
 
@@ -188,6 +191,14 @@ class GameNotifier extends StateNotifier<GameState> {
     if (diskCount > 7) diskCount = 7;
 
     _initializeGame(diskCount);
+  }
+
+  /// Set a custom time limit
+  void setTimeLimit(int seconds) {
+    if (seconds < 10) seconds = 10; // Minimum 10 seconds
+    if (seconds > 600) seconds = 600; // Maximum 10 minutes
+
+    state = state.copyWith(timeLimit: seconds);
   }
 
   void resetGame() {
@@ -209,6 +220,22 @@ class GameNotifier extends StateNotifier<GameState> {
     state = state.copyWith(isMusicPlaying: playMusic ?? !state.isMusicPlaying);
   }
 
+  /// Handles game over due to time running out
+  void _handleGameOver() {
+    _timer?.cancel();
+    _timer = null;
+    _autoSolveTimer?.cancel();
+
+    GameAudioPlayer.playEffect(GameSounds.lost);
+
+    state = state.copyWith(
+      isPlaying: false,
+      hasLost: true,
+      isAutoSolving: false,
+      selectedTowerId: null,
+    );
+  }
+
   /// Initiates the auto-solving feature to solve the puzzle automatically.
   ///
   /// This method generates a sequence of moves to solve the Tower of Hanoi puzzle
@@ -222,10 +249,8 @@ class GameNotifier extends StateNotifier<GameState> {
   void autoSolve() {
     if (state.isAutoSolving) return;
 
-    // Reset the game if it's won
-    if (state.hasWon) {
-      resetGame();
-    }
+    // Reset the game if it's won or lost
+    if (state.hasWon || state.hasLost) resetGame();
 
     // Generate solution moves
     _solveMoves = [];
@@ -240,6 +265,7 @@ class GameNotifier extends StateNotifier<GameState> {
       isPlaying: true,
       isAutoSolving: true,
       selectedTowerId: null,
+      hasLost: false, // Reset loss state
     );
 
     _startTimer();
@@ -276,6 +302,7 @@ class GameNotifier extends StateNotifier<GameState> {
   void dispose() {
     _timer?.cancel();
     _autoSolveTimer?.cancel();
+    _selectionTimer?.cancel();
     super.dispose();
   }
 }

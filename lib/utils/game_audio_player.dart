@@ -17,6 +17,7 @@ class GameAudioPlayer {
     GameSounds.win: winSound,
     GameSounds.reset: resetSound,
     GameSounds.click: clickSound,
+    GameSounds.lost: lostSound,
   };
 
   /// Preload all sounds during initialization

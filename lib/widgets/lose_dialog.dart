@@ -5,14 +5,14 @@ import '../providers/game_provider.dart';
 import '../utils/utils.dart';
 import 'action_button.dart';
 
-class WinDialog extends ConsumerStatefulWidget {
-  const WinDialog({super.key});
+class LoseDialog extends ConsumerStatefulWidget {
+  const LoseDialog({super.key});
 
   @override
-  ConsumerState<WinDialog> createState() => _WinDialogState();
+  ConsumerState<LoseDialog> createState() => _LoseDialogState();
 }
 
-class _WinDialogState extends ConsumerState<WinDialog>
+class _LoseDialogState extends ConsumerState<LoseDialog>
     with SingleTickerProviderStateMixin {
   final delayDuration = const Duration(milliseconds: 300);
   bool _isExpanded = false;
@@ -56,25 +56,21 @@ class _WinDialogState extends ConsumerState<WinDialog>
                 scale: _isExpanded ? 1.5 : 1.0,
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOutBack,
-                child: Icon(
-                  Icons.emoji_events_rounded,
-                  color: Colors.amber,
-                  size: 64,
-                ),
+                child: Icon(Icons.error_rounded, color: Colors.red, size: 64),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Congratulations!',
+                "Time's Up!",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.red,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'You solved the puzzle!',
+                'You ran out of time!',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white.withAlpha(204),
@@ -82,25 +78,49 @@ class _WinDialogState extends ConsumerState<WinDialog>
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
+              _buildStatRow('Disks', '${gameState.diskCount}'),
               _buildStatRow('Moves', '${gameState.moves}'),
-              _buildStatRow('Minimum Moves', '${gameState.minimumMoves}'),
               _buildStatRow('Time Limit', gameState.timeLimit.formatTime()),
-              _buildStatRow('Time Spent', gameState.seconds.formatTime()),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ActionButton(
-                    icon: Icons.play_arrow,
-                    label: 'Play Again',
-                    backgroundColor: Colors.green,
-                    onPressed: () {
-                      GameAudioPlayer.playEffect(GameSounds.click);
-                      ref.read(gameProvider.notifier).resetGame();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
+              Text(
+                'Try again with less disks or more time!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.white.withAlpha(204),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ActionButton(
+                      icon: Icons.refresh_rounded,
+                      label: 'Retry',
+                      backgroundColor: Colors.orange,
+                      onPressed: () {
+                        GameAudioPlayer.playEffect(GameSounds.click);
+                        ref.read(gameProvider.notifier).resetGame();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    const SizedBox(width: 16),
+                    ActionButton(
+                      icon: Icons.auto_awesome_rounded,
+                      label: 'Auto Solve',
+                      backgroundColor: Colors.green,
+                      onPressed: () {
+                        GameAudioPlayer.playEffect(GameSounds.click);
+                        ref.read(gameProvider.notifier).autoSolve();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

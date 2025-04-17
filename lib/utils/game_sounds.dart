@@ -1,1 +1,1 @@
-enum GameSounds { select, deselect, move, error, win, clap, reset, click }
+enum GameSounds { select, deselect, move, error, win, clap, reset, click, lost }

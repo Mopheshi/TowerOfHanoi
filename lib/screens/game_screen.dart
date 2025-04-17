@@ -26,14 +26,16 @@ class GameScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameProvider);
 
-    // Show win dialog if game is won
-    if (gameState.hasWon) {
+    // Show win or lose dialog if game is over
+    if (gameState.hasWon || gameState.hasLost) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (ModalRoute.of(context)?.isCurrent ?? false) {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => const WinDialog(),
+            builder:
+                (context) =>
+                    gameState.hasWon ? const WinDialog() : const LoseDialog(),
           );
         }
       });
@@ -44,10 +46,10 @@ class GameScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          appName,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text(appName),
+        titleTextStyle: Theme.of(
+          context,
+        ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
         centerTitle: true,
         actions: [
           IconButton(

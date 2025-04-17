@@ -47,7 +47,11 @@ class GameControls extends ConsumerWidget {
       children: [
         const Text(
           'Disks:',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(width: 16),
         CircleButton(
