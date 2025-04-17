@@ -106,7 +106,10 @@ class GameControls extends ConsumerWidget {
             icon: Icons.auto_awesome_rounded,
             onPressed:
                 gameState.isAutoSolving ? null : () => gameNotifier.autoSolve(),
-            backgroundColor: Colours.blueColor,
+            backgroundColor:
+                gameState.isAutoSolving
+                    ? Theme.of(context).colorScheme.surfaceDim
+                    : Colours.greenColor,
           ),
         ],
       ),

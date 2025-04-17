@@ -81,7 +81,7 @@ class StatsPanel extends ConsumerWidget {
         ),
         const SizedBox(height: 2),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           decoration: BoxDecoration(
             color: color.withAlpha(51),
             borderRadius: BorderRadius.circular(20),
