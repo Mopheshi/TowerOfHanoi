@@ -44,26 +44,56 @@ class DiskWidget extends StatelessWidget {
           isSelected
               ? Matrix4.translationValues(0, -20, 0)
               : Matrix4.identity(),
-      decoration: BoxDecoration(
-        color: disk.color,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(76),
-            offset: const Offset(0, 3),
-            blurRadius: 4,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Container(
+            height: 25,
+            width: width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.horizontal(
+                left: Radius.circular(12.5),
+                right: Radius.circular(12.5),
+              ),
+              border: Border.all(color: Colors.black, width: 1),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.lerp(disk.color, Colors.white, 0.3)!,
+                  disk.color,
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(76),
+                  offset: const Offset(0, 3),
+                  blurRadius: 4,
+                ),
+                BoxShadow(
+                  color:
+                      isSelected
+                          ? Colors.white.withAlpha(76)
+                          : Colors.transparent,
+                  blurRadius: isSelected ? 8 : 0,
+                  spreadRadius: isSelected ? 1 : 0,
+                ),
+              ],
+            ),
           ),
-          BoxShadow(
-            color: isSelected ? Colors.white.withAlpha(76) : Colors.transparent,
-            blurRadius: isSelected ? 8 : 0,
-            spreadRadius: isSelected ? 1 : 0,
+          Container(
+            height: 8,
+            width: width,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.white.withAlpha(127), disk.color],
+              ),
+            ),
           ),
         ],
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [disk.color.withAlpha(204), disk.color],
-        ),
       ),
     );
   }

@@ -32,8 +32,8 @@ class TowerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final diskAreaHeight = maxHeight * 0.75;
-    final baseHeight = maxHeight * 0.05;
-    final rodWidth = 12.0;
+    final baseHeight = maxHeight * 0.06;
+    final rodWidth = 15.0;
 
     return GestureDetector(
       onTap: onTap,
@@ -59,7 +59,16 @@ class TowerWidget extends StatelessWidget {
                     width: rodWidth,
                     height: diskAreaHeight,
                     decoration: BoxDecoration(
-                      color: Colours.brownColor,
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color.lerp(Colours.brownColor, Colors.black, 0.2)!,
+                          Color.lerp(Colours.brownColor, Colors.white, 0.2)!,
+                          Color.lerp(Colours.brownColor, Colors.black, 0.2)!,
+                        ],
+                      ),
+                      // border: Border.all(color: Colors.black, width: 1),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(rodWidth / 2),
                         topRight: Radius.circular(rodWidth / 2),
@@ -70,11 +79,27 @@ class TowerWidget extends StatelessWidget {
 
                 // Tower base
                 Container(
-                  width: 100,
+                  width: 120,
                   height: baseHeight,
                   decoration: BoxDecoration(
-                    color: Colours.brownColor,
-                    borderRadius: BorderRadius.circular(5),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color.lerp(Colours.brownColor, Colors.white, 0.15)!,
+                        Color.lerp(Colours.brownColor, Colors.black, 0.15)!,
+                      ],
+                    ),
+                    border: Border.all(color: Colors.black, width: 1.5),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(76),
+                        offset: Offset(0, 2),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
                 ),
 
@@ -104,7 +129,6 @@ class TowerWidget extends StatelessWidget {
                                         bottom: 4.0,
                                       ),
                                       child: DiskWidget(
-                                        // Unique key based on disk size
                                         key: ValueKey(disk.size),
                                         disk: disk,
                                         isTop: isTopDisk,
