@@ -19,7 +19,7 @@ class _CircleButtonState extends State<CircleButton> {
     final baseColors =
         widget.onPressed != null
             ? [Colors.blue.shade200, Colors.blue.shade900]
-            : [Colors.grey.shade400, Colors.grey.shade800];
+            : [Colors.grey.shade400, Theme.of(context).colorScheme.surfaceDim];
     final colors =
         _isPressed
             ? baseColors.map((c) => Color.lerp(c, Colors.black, 0.1)!).toList()
