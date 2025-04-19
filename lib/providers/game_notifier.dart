@@ -84,6 +84,9 @@ class GameNotifier extends StateNotifier<GameState> {
   /// - Triggers disk movement if applicable.
   /// - Plays appropriate sound effects.
   void selectTower(int towerId) {
+    // Cancel any lingering timers
+    _selectionTimer?.cancel();
+
     if (state.selectedTowerId == null) {
       if (state.towers[towerId].topDisk != null) {
         GameAudioPlayer.playEffect(GameSounds.select);
@@ -121,23 +124,17 @@ class GameNotifier extends StateNotifier<GameState> {
       newTowers[toTowerId] = newTowers[toTowerId].addDisk(disk);
       GameAudioPlayer.playEffect(GameSounds.move);
 
-      // Check if the game was not already playing
-      bool wasPlaying = state.isPlaying;
+      // Cancel any existing timer and deselect immediately
+      _selectionTimer?.cancel();
+
       state = state.copyWith(
         towers: newTowers,
         moves: state.moves + 1,
         isPlaying: true,
+        selectedTowerId: null, // Immediate deselection
       );
 
-      if (!wasPlaying) _startTimer();
-
-      // Cancel any existing selection timer before starting a new one
-      _selectionTimer?.cancel();
-      _selectionTimer = Timer(
-        const Duration(milliseconds: 300),
-        () => state = state.copyWith(selectedTowerId: null),
-      );
-
+      if (!state.isPlaying) _startTimer();
       _checkWin();
     } else {
       GameAudioPlayer.playEffect(GameSounds.error);
