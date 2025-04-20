@@ -74,6 +74,9 @@ See the app in action!
 ![Win Dialog](screenshots/win_dialog.png)  
 *Celebrate your victory!*
 
+![Lose Dialog](screenshots/lose_dialog.png)  
+*Celebrate your victory!*
+
 ---
 
 ## 🛠️ Technologies Used
