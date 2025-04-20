@@ -83,7 +83,9 @@ This app is powered by cutting-edge tools:
 - **Flutter:** Cross-platform UI framework for a seamless experience.
 - **Dart:** The language behind the app’s logic and interactivity.
 - **Riverpod:** State management for smooth, reactive updates.
-- **Audioplayers:** Adds background music and sound effects.
+- **GoogleFonts:** Beautiful typography for a polished look.
+- **JustAudio:** Adds background music and sound effects.
+- **AudioSession:** Manages audio sessions for a polished experience.
 
 ---
 
