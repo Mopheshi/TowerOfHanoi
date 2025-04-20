@@ -36,41 +36,25 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     });
   }
 
-  /// Builds the main game screen UI, adapting to different orientations.
-  ///
-  /// This method constructs the user interface for the game, including the towers,
-  /// control buttons, and statistics panel. It dynamically adjusts the layout for
-  /// portrait and landscape orientations and displays a win dialog when the game
-  /// is completed.
-  ///
-  /// **Parameters:**
-  /// - [context]: The build context used for rendering the UI.
-  /// - [ref]: The WidgetRef for accessing Riverpod providers.
-  ///
-  /// **Returns:**
-  /// - A [Widget] representing the game screen layout.
   @override
   Widget build(BuildContext context) {
     // Initial check for first launch
     final hasAcceptedRules = ref.read(rulesProvider);
-    if (!hasAcceptedRules) {
-      ref.read(rulesProvider.notifier).acceptRules();
-    }
+    if (!hasAcceptedRules) ref.read(rulesProvider.notifier).acceptRules();
 
     final gameState = ref.watch(gameProvider);
 
     // Show win or lose dialog if game is over
-    if (gameState.hasWon || gameState.hasLost) {
+    if ((gameState.hasWon || gameState.hasLost) &&
+        (ModalRoute.of(context)?.isCurrent ?? false)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (ModalRoute.of(context)?.isCurrent ?? false) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder:
-                (context) =>
-                    gameState.hasWon ? const WinDialog() : const LoseDialog(),
-          );
-        }
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder:
+              (context) =>
+                  gameState.hasWon ? const WinDialog() : const LoseDialog(),
+        );
       });
     }
 

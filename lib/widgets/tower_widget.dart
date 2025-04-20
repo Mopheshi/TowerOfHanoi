@@ -18,17 +18,6 @@ class TowerWidget extends StatelessWidget {
     required this.onTap,
   });
 
-  /// Renders a tower with its disks and handles tower selection.
-  ///
-  /// This method constructs the visual representation of a tower, including the rod,
-  /// base, and stacked disks. It also manages the selection state, applying animations
-  /// when the tower is selected by the user.
-  ///
-  /// **Parameters:**
-  /// - [context]: The build context used for rendering the widget.
-  ///
-  /// **Returns:**
-  /// - A [Widget] representing the tower and its disks.
   @override
   Widget build(BuildContext context) {
     final diskAreaHeight = maxHeight * 0.75;

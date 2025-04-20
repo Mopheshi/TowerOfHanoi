@@ -16,17 +16,6 @@ class DiskWidget extends StatelessWidget {
     required this.totalDisks,
   });
 
-  /// Renders a disk with animations for selection.
-  ///
-  /// This method builds the visual representation of a single disk, including its
-  /// size, color, and selection state. It incorporates animations to visually
-  /// indicate when the disk is part of a selected tower.
-  ///
-  /// **Parameters:**
-  /// - [context]: The build context used for rendering the widget.
-  ///
-  /// **Returns:**
-  /// - A [Widget] representing the disk with its visual properties.
   @override
   Widget build(BuildContext context) {
     final maxWidth = 130.0;
