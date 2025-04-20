@@ -5,7 +5,7 @@ class GameState {
   final int? selectedTowerId;
   final int moves;
   final int diskCount;
-  final int seconds;
+  final int timeSpent;
   final int timeLimit;
   final bool isPlaying;
   final bool isAutoSolving;
@@ -18,7 +18,7 @@ class GameState {
     this.selectedTowerId,
     this.moves = 0,
     this.diskCount = 3,
-    this.seconds = 0,
+    this.timeSpent = 0,
     this.timeLimit = 0,
     this.isPlaying = false,
     this.isAutoSolving = false,
@@ -32,7 +32,7 @@ class GameState {
     int? selectedTowerId,
     int? moves,
     int? diskCount,
-    int? seconds,
+    int? timeSpent,
     int? timeLimit,
     bool? isPlaying,
     bool? isAutoSolving,
@@ -45,7 +45,7 @@ class GameState {
       selectedTowerId: selectedTowerId,
       moves: moves ?? this.moves,
       diskCount: diskCount ?? this.diskCount,
-      seconds: seconds ?? this.seconds,
+      timeSpent: timeSpent ?? this.timeSpent,
       timeLimit: timeLimit ?? this.timeLimit,
       isPlaying: isPlaying ?? this.isPlaying,
       isAutoSolving: isAutoSolving ?? this.isAutoSolving,
@@ -56,9 +56,6 @@ class GameState {
   }
 
   int get minimumMoves => (1 << diskCount) - 1; // 2^n - 1
-
-  // Calculate remaining time
-  int get remainingTime => timeLimit - seconds > 0 ? timeLimit - seconds : 0;
 
   /// Calculate recommended time limit based on disk count
   /// This gives players approximately 2-3 seconds per minimum move required

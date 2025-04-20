@@ -7,36 +7,20 @@ import '../utils/utils.dart';
 import 'game_state.dart';
 
 class GameNotifier extends StateNotifier<GameState> {
-  Timer? _timer, _autoSolveTimer, _selectionTimer;
+  Timer? _autoSolveTimer, _selectionTimer;
   List<List<int>> _solveMoves = [];
   int _currentSolveMove = 0;
 
   GameNotifier() : super(GameState(towers: [])) {
     _initializeGame(minDiskCount);
-    // Start music by default and update state to match
     GameAudioPlayer.playBackgroundMusic().then(
       (_) => state = state.copyWith(isMusicPlaying: true),
     );
   }
 
-  /// Initializes the game with the specified number of disks.
-  ///
-  /// This method sets up the initial state of the game by creating three towers
-  /// and adding disks to the first tower in descending order of size. It also
-  /// resets the timer and auto-solve features to their default states.
-  ///
-  /// **Parameters:**
-  /// - [diskCount]: The number of disks to initialize the game with.
-  ///
-  /// **Side Effects:**
-  /// - Resets the game state, including towers, move count, and timer.
-  /// - Prepares the game for manual play or auto-solving.
   void _initializeGame(int diskCount) {
     final diskColors = Colours.diskColors;
-
-    // Create towers
-    final towers = List.generate(minDiskCount, (i) => Tower(id: i));
-    // Add disks to the first tower
+    final towers = List.generate(3, (i) => Tower(id: i));
     towers[0] = towers[0].copyWith(
       disks: List.generate(diskCount, (index) {
         final size = diskCount - index;
@@ -45,17 +29,11 @@ class GameNotifier extends StateNotifier<GameState> {
       }),
     );
 
-    // Reset the timer
-    _timer?.cancel();
-    _timer = null;
-
-    // Reset auto-solve
     _autoSolveTimer?.cancel();
     _autoSolveTimer = null;
     _solveMoves = [];
     _currentSolveMove = 0;
 
-    // Calculate appropriate time limit based on disk count
     final timeLimit = GameState.calculateTimeLimit(diskCount);
 
     state = GameState(
@@ -68,25 +46,8 @@ class GameNotifier extends StateNotifier<GameState> {
     if (!state.isMusicPlaying) GameAudioPlayer.playBackgroundMusic();
   }
 
-  /// Handles the selection of a tower and the movement of disks.
-  ///
-  /// This method manages the logic for selecting a tower and moving disks between
-  /// towers. If no tower is currently selected, it selects the tapped tower if it
-  /// has disks. If a tower is already selected, it either deselects it (if the same
-  /// tower is tapped) or attempts to move the top disk to the tapped tower. Audio
-  /// feedback is provided based on the action (e.g., selection or move sounds).
-  ///
-  /// **Parameters:**
-  /// - [towerId]: The ID of the tower that was tapped.
-  ///
-  /// **Side Effects:**
-  /// - Updates the selected tower state.
-  /// - Triggers disk movement if applicable.
-  /// - Plays appropriate sound effects.
   void selectTower(int towerId) {
-    // Cancel any lingering timers
     _selectionTimer?.cancel();
-
     if (state.selectedTowerId == null) {
       if (state.towers[towerId].topDisk != null) {
         GameAudioPlayer.playEffect(GameSounds.select);
@@ -100,22 +61,6 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
-  /// Moves a disk from one tower to another if the move is valid.
-  ///
-  /// This private method performs the actual movement of a disk from the source
-  /// tower to the destination tower. It checks if the move is legal (i.e., the disk
-  /// can be placed on the destination tower based on size rules) and updates the
-  /// game state accordingly. If the move is invalid, it plays an error sound and
-  /// deselects the tower.
-  ///
-  /// **Parameters:**
-  /// - [fromTowerId]: The ID of the tower to move the disk from.
-  /// - [toTowerId]: The ID of the tower to move the disk to.
-  ///
-  /// **Side Effects:**
-  /// - Updates the towers' disk stacks.
-  /// - Increments the move counter.
-  /// - Plays success or error sounds based on move validity.
   void _moveDisk(int fromTowerId, int toTowerId) {
     final newTowers = List<Tower>.from(state.towers);
     final disk = newTowers[fromTowerId].topDisk;
@@ -124,17 +69,13 @@ class GameNotifier extends StateNotifier<GameState> {
       newTowers[toTowerId] = newTowers[toTowerId].addDisk(disk);
       GameAudioPlayer.playEffect(GameSounds.move);
 
-      // Cancel any existing timer and deselect immediately
-      _selectionTimer?.cancel();
-
       state = state.copyWith(
         towers: newTowers,
         moves: state.moves + 1,
         isPlaying: true,
-        selectedTowerId: null, // Immediate deselection
+        selectedTowerId: null,
       );
 
-      if (!state.isPlaying) _startTimer();
       _checkWin();
     } else {
       GameAudioPlayer.playEffect(GameSounds.error);
@@ -142,60 +83,23 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
-  /// Checks if the game has been won and handles win actions.
-  ///
-  /// This method evaluates the win condition by checking if all disks have been
-  /// moved to either the second or third tower. If the condition is met, it stops
-  /// the timer, plays win sounds, and updates the game state to reflect the victory.
-  ///
-  /// **Side Effects:**
-  /// - Stops the game timer.
-  /// - Triggers win audio effects.
-  /// - Marks the game as won.
   void _checkWin() {
-    // Game is won if all disks are on tower 2 or 3
     final tower2Complete = state.towers[1].disks.length == state.diskCount;
     final tower3Complete = state.towers[2].disks.length == state.diskCount;
 
     if (tower2Complete || tower3Complete) {
-      _timer?.cancel();
-      _timer = null;
-
       GameAudioPlayer.playEffect(GameSounds.clap);
       GameAudioPlayer.playEffect(GameSounds.win);
-
       state = state.copyWith(isPlaying: false, hasWon: true);
     }
   }
 
-  void _startTimer() {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final newSeconds = state.seconds + 1;
-
-      // Check if time has run out
-      if (newSeconds >= state.timeLimit && state.isPlaying && !state.hasWon) {
-        _handleGameOver();
-        return;
-      }
-
-      state = state.copyWith(seconds: newSeconds);
-    });
-  }
-
   void changeDiskCount(int diskCount) {
     if (diskCount < 1) diskCount = 1;
-    if (diskCount > 7) diskCount = 7;
-
+    if (diskCount > maxDiskCount) diskCount = maxDiskCount;
+    final timeLimit = GameState.calculateTimeLimit(diskCount);
+    state = state.copyWith(diskCount: diskCount, timeLimit: timeLimit);
     _initializeGame(diskCount);
-  }
-
-  /// Set a custom time limit
-  void setTimeLimit(int seconds) {
-    if (seconds < 10) seconds = 10; // Minimum 10 seconds
-    if (seconds > 600) seconds = 600; // Maximum 10 minutes
-
-    state = state.copyWith(timeLimit: seconds);
   }
 
   void resetGame() {
@@ -203,69 +107,66 @@ class GameNotifier extends StateNotifier<GameState> {
     _initializeGame(state.diskCount);
   }
 
-  /// Toggles the background music state.
-  ///
-  /// This method updates the game state to reflect the desired music
-  /// playback status.
-  ///
-  /// **Parameters:**
-  /// - [playMusic]: Whether music should be playing after this toggle.
-  ///
-  /// **Side Effects:**
-  /// - Updates the isMusicPlaying property in the game state.
   void toggleMusicState([bool? playMusic]) {
     state = state.copyWith(isMusicPlaying: playMusic ?? !state.isMusicPlaying);
   }
 
-  /// Handles game over due to time running out
-  void _handleGameOver() {
-    _timer?.cancel();
-    _timer = null;
+  void handleGameOver() {
     _autoSolveTimer?.cancel();
-
     GameAudioPlayer.playEffect(GameSounds.lost);
-
     state = state.copyWith(
       isPlaying: false,
       hasLost: true,
+      timeSpent: state.timeSpent,
       isAutoSolving: false,
       selectedTowerId: null,
     );
   }
 
-  /// Initiates the auto-solving feature to solve the puzzle automatically.
-  ///
-  /// This method generates a sequence of moves to solve the Tower of Hanoi puzzle
-  /// using a recursive algorithm. It resets the game state for auto-solving, starts
-  /// a timer, and executes the moves step-by-step with a delay between each move.
-  ///
-  /// **Side Effects:**
-  /// - Resets the game state for auto-solving.
-  /// - Generates and stores the list of moves.
-  /// - Executes moves with visual and audio feedback.
+  void updateGameState({
+    List<Tower>? towers,
+    int? selectedTowerId,
+    int? moves,
+    int? diskCount,
+    int? timeSpent,
+    int? timeLimit,
+    bool? isPlaying,
+    bool? isAutoSolving,
+    bool? hasWon,
+    bool? hasLost,
+    bool? isMusicPlaying,
+  }) {
+    state = state.copyWith(
+      towers: towers ?? state.towers,
+      selectedTowerId: selectedTowerId ?? state.selectedTowerId,
+      moves: moves ?? state.moves,
+      diskCount: diskCount ?? state.diskCount,
+      timeSpent: timeSpent ?? state.timeSpent,
+      timeLimit: timeLimit ?? state.timeLimit,
+      isPlaying: isPlaying ?? state.isPlaying,
+      isAutoSolving: isAutoSolving ?? state.isAutoSolving,
+      hasWon: hasWon ?? state.hasWon,
+      hasLost: hasLost ?? state.hasLost,
+      isMusicPlaying: isMusicPlaying ?? state.isMusicPlaying,
+    );
+  }
+
   void autoSolve() {
     if (state.isAutoSolving) return;
-
-    // Reset the game if it's won or lost
     if (state.hasWon || state.hasLost) resetGame();
 
-    // Generate solution moves
     _solveMoves = [];
     _generateSolveMoves(state.diskCount, 0, 1, 2);
     _currentSolveMove = 0;
 
-    // Reset moves and timer
-    _timer?.cancel();
     state = state.copyWith(
       moves: 0,
-      seconds: 0,
       isPlaying: true,
       isAutoSolving: true,
       selectedTowerId: null,
-      hasLost: false, // Reset loss state
+      hasLost: false,
     );
 
-    _startTimer();
     _executeNextSolveMove();
   }
 
@@ -297,7 +198,6 @@ class GameNotifier extends StateNotifier<GameState> {
 
   @override
   void dispose() {
-    _timer?.cancel();
     _autoSolveTimer?.cancel();
     _selectionTimer?.cancel();
     super.dispose();

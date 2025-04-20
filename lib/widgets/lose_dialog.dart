@@ -85,6 +85,7 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
               _buildStatRow('Disks', '${gameState.diskCount}'),
               _buildStatRow('Moves', '${gameState.moves}'),
               _buildStatRow('Time Limit', gameState.timeLimit.formatTime()),
+              _buildStatRow('Time Spent', gameState.timeSpent.formatTime()),
               const SizedBox(height: 24),
               Text(
                 'Try again with less disks or more time!',
