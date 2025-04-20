@@ -56,12 +56,14 @@ class GameAudioPlayer {
   /// Play background music
   static Future<void> playBackgroundMusic() async {
     try {
+      ll("Loading background music: $backgroundMusic");
       await _musicPlayer.setAsset(backgroundMusic);
       await _musicPlayer.setLoopMode(LoopMode.one);
       await _musicPlayer.play();
       ll("Background music started");
-    } catch (e) {
+    } catch (e, stackTrace) {
       ll("Failed to play background music: $e");
+      ll("Stack trace: $stackTrace");
     }
   }
 
