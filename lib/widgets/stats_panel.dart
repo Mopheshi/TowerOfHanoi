@@ -18,9 +18,22 @@ class _StatsPanelState extends ConsumerState<StatsPanel> {
   int _elapsedSeconds = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _setupTimerListener();
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  void _setupTimerListener() {
+    ref.listenManual(gameProvider, (previous, next) {
+      if (next.isPlaying && _timer == null) _startTimer();
+      else if (!next.isPlaying && _timer != null) _stopTimer();
+    });
   }
 
   void _startTimer() {
@@ -52,12 +65,6 @@ class _StatsPanelState extends ConsumerState<StatsPanel> {
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
-
-    if (gameState.isPlaying && _timer == null) {
-      _startTimer();
-    } else if (!gameState.isPlaying && _timer != null) {
-      _stopTimer();
-    }
 
     final remainingTime = gameState.timeLimit - _elapsedSeconds;
     final displayTime = remainingTime > 0 ? remainingTime : 0;
