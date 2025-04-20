@@ -85,7 +85,7 @@ class _WinDialogState extends ConsumerState<WinDialog>
               _buildStatRow('Moves', '${gameState.moves}'),
               _buildStatRow('Minimum Moves', '${gameState.minimumMoves}'),
               _buildStatRow('Time Limit', gameState.timeLimit.formatTime()),
-              _buildStatRow('Time Spent', gameState.seconds.formatTime()),
+              _buildStatRow('Time Spent', gameState.timeSpent.formatTime()),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
