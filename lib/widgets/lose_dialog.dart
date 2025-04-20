@@ -56,7 +56,11 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
                 scale: _isExpanded ? 1.5 : 1.0,
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOutBack,
-                child: Icon(Icons.error_rounded, color: Colors.red, size: 64),
+                // child: Icon(Icons.error_rounded, color: Colors.red, size: 64),
+                child: Text(
+                  '😢',
+                  style: const TextStyle(fontSize: 64, color: Colors.red),
+                ),
               ),
               const SizedBox(height: 16),
               const Text(
