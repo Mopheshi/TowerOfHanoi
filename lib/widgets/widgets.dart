@@ -1,5 +1,6 @@
 export "action_button.dart";
 export "circle_button.dart";
+export "custom_container.dart";
 export "disk_widget.dart";
 export "game_controls.dart";
 export "lose_dialog.dart";

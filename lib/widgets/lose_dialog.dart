@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/game_provider.dart';
 import '../utils/utils.dart';
-import 'action_button.dart';
+import 'widgets.dart';
 
 class LoseDialog extends ConsumerStatefulWidget {
   const LoseDialog({super.key});
@@ -34,18 +34,7 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       backgroundColor: Colors.transparent,
       elevation: 20,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.surfaceBright,
-              Theme.of(context).colorScheme.surfaceDim,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(30),
-        ),
+      child: CustomContainer(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(24),
