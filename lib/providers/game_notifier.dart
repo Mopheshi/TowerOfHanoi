@@ -18,6 +18,9 @@ class GameNotifier extends StateNotifier<GameState> {
     );
   }
 
+  /// Initializes the game with the specified number of disks.
+  /// Sets up the towers, disks, and game state.
+  /// Cancels any active auto-solve timers.
   void _initializeGame(int diskCount) {
     final diskColors = Colours.diskColors;
     final towers = List.generate(3, (i) => Tower(id: i));
@@ -46,6 +49,9 @@ class GameNotifier extends StateNotifier<GameState> {
     if (!state.isMusicPlaying) GameAudioPlayer.playBackgroundMusic();
   }
 
+  /// Handles the selection of a tower by the player.
+  /// If a tower is already selected, attempts to move a disk to the new tower.
+  /// Plays appropriate sound effects based on the action.
   void selectTower(int towerId) {
     _selectionTimer?.cancel();
     if (state.selectedTowerId == null) {
@@ -61,6 +67,9 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
+  /// Moves a disk from one tower to another.
+  /// Validates the move and updates the game state.
+  /// Plays sound effects for successful or invalid moves.
   void _moveDisk(int fromTowerId, int toTowerId) {
     final newTowers = List<Tower>.from(state.towers);
     final disk = newTowers[fromTowerId].topDisk;
@@ -83,6 +92,9 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
+  /// Moves a disk from one tower to another.
+  /// Validates the move and updates the game state.
+  /// Plays sound effects for successful or invalid moves.
   void _checkWin() {
     final tower2Complete = state.towers[1].disks.length == state.diskCount;
     final tower3Complete = state.towers[2].disks.length == state.diskCount;
@@ -94,6 +106,8 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
+  /// Changes the number of disks in the game.
+  /// Reinitializes the game with the new disk count and updates the time limit.
   void changeDiskCount(int diskCount) {
     if (diskCount < 1) diskCount = 1;
     if (diskCount > maxDiskCount) diskCount = maxDiskCount;
@@ -102,15 +116,21 @@ class GameNotifier extends StateNotifier<GameState> {
     _initializeGame(diskCount);
   }
 
+  /// Resets the game to its initial state with the current disk count.
+  /// Plays a reset sound effect and reinitializes the game.
   void resetGame() {
     GameAudioPlayer.playEffect(GameSounds.reset);
     _initializeGame(state.diskCount);
   }
 
+  /// Toggles the background music state.
+  /// Optionally accepts a parameter to explicitly enable or disable music.
   void toggleMusicState([bool? playMusic]) {
     state = state.copyWith(isMusicPlaying: playMusic ?? !state.isMusicPlaying);
   }
 
+  /// Handles the game over state when the player loses.
+  /// Cancels any active auto-solve timers and updates the game state.
   void handleGameOver() {
     _autoSolveTimer?.cancel();
     GameAudioPlayer.playEffect(GameSounds.lost);
@@ -123,6 +143,8 @@ class GameNotifier extends StateNotifier<GameState> {
     );
   }
 
+  /// Updates the game state with the provided parameters.
+  /// Allows partial updates to specific fields in the game state.
   void updateGameState({
     List<Tower>? towers,
     int? selectedTowerId,
@@ -151,6 +173,8 @@ class GameNotifier extends StateNotifier<GameState> {
     );
   }
 
+  /// Automatically solves the Tower of Hanoi puzzle.
+  /// Generates the sequence of moves and executes them step by step.
   void autoSolve() {
     if (state.isAutoSolving) return;
     if (state.hasWon || state.hasLost) resetGame();
@@ -170,6 +194,8 @@ class GameNotifier extends StateNotifier<GameState> {
     _executeNextSolveMove();
   }
 
+  /// Recursively generates the sequence of moves to solve the Tower of Hanoi puzzle.
+  /// Uses the source, auxiliary, and target towers to calculate the moves.
   void _generateSolveMoves(int n, int source, int auxiliary, int target) {
     if (n > 0) {
       _generateSolveMoves(n - 1, source, target, auxiliary);
@@ -178,6 +204,8 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
+  /// Executes the next move in the auto-solve sequence.
+  /// Updates the game state and schedules the next move.
   void _executeNextSolveMove() {
     if (_currentSolveMove >= _solveMoves.length) {
       state = state.copyWith(isAutoSolving: false);
@@ -196,6 +224,8 @@ class GameNotifier extends StateNotifier<GameState> {
     });
   }
 
+  /// Disposes of resources used by the notifier, such as timers.
+  /// Ensures proper cleanup when the notifier is no longer needed.
   @override
   void dispose() {
     _autoSolveTimer?.cancel();
