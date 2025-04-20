@@ -1,13 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/game_provider.dart';
-import '../utils/constants.dart';
-import '../utils/game_audio_player.dart';
+import '../providers/providers.dart';
+import '../utils/utils.dart';
 import '../widgets/widgets.dart';
 
-class GameScreen extends ConsumerWidget {
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
+
+  @override
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _listenToRulesStateChanges();
+  }
+
+  /// Listen to rules state changes
+  void _listenToRulesStateChanges() {
+    ref.listenManual<bool>(rulesProvider, (previous, next) {
+      if (!next && context.mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (ModalRoute.of(context)?.isCurrent ?? false) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const RulesDialog(),
+            );
+          }
+        });
+      }
+    });
+  }
 
   /// Builds the main game screen UI, adapting to different orientations.
   ///
@@ -23,7 +50,13 @@ class GameScreen extends ConsumerWidget {
   /// **Returns:**
   /// - A [Widget] representing the game screen layout.
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    // Initial check for first launch
+    final hasAcceptedRules = ref.read(rulesProvider);
+    if (!hasAcceptedRules) {
+      ref.read(rulesProvider.notifier).acceptRules();
+    }
+
     final gameState = ref.watch(gameProvider);
 
     // Show win or lose dialog if game is over

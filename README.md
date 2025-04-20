@@ -89,6 +89,7 @@ This app is powered by cutting-edge tools:
 - **GoogleFonts:** Beautiful typography for a polished look.
 - **JustAudio:** Adds background music and sound effects.
 - **AudioSession:** Manages audio sessions for a polished experience.
+- **SharedPreferences:** Stores user preferences for a personalized touch.
 
 ---
 

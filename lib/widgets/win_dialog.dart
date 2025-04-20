@@ -82,7 +82,6 @@ class _WinDialogState extends ConsumerState<WinDialog>
                   ActionButton(
                     icon: Icons.play_arrow,
                     label: 'Play Again',
-                    backgroundColor: Colors.green,
                     onPressed: () {
                       GameAudioPlayer.playEffect(GameSounds.click);
                       ref.read(gameProvider.notifier).resetGame();

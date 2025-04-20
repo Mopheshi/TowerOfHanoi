@@ -106,7 +106,6 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
                     ActionButton(
                       icon: Icons.auto_awesome_rounded,
                       label: 'Auto Solve',
-                      backgroundColor: Colors.green,
                       onPressed: () {
                         GameAudioPlayer.playEffect(GameSounds.click);
                         ref.read(gameProvider.notifier).autoSolve();

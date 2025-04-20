@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../utils/colours.dart';
+
 class ActionButton extends StatefulWidget {
   final String label;
   final IconData icon;
   final VoidCallback? onPressed;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   const ActionButton({
     super.key,
     required this.label,
     required this.icon,
     this.onPressed,
-    required this.backgroundColor,
+    this.backgroundColor = Colours.greenColor,
   });
 
   @override
@@ -26,7 +28,7 @@ class _ActionButtonState extends State<ActionButton> {
   Widget build(BuildContext context) {
     final baseColors = [
       Color.lerp(widget.backgroundColor, Colors.white, 0.3)!,
-      widget.backgroundColor,
+      widget.backgroundColor!,
     ];
     final colors =
         _isPressed
@@ -34,24 +36,21 @@ class _ActionButtonState extends State<ActionButton> {
             : baseColors;
 
     return GestureDetector(
-      onTapDown: (_) {
-        setState(() {
-          _scale = 0.9;
-          _isPressed = true;
-        });
-      },
-      onTapUp: (_) {
-        setState(() {
-          _scale = 1.0;
-          _isPressed = false;
-        });
-      },
-      onTapCancel: () {
-        setState(() {
-          _scale = 1.0;
-          _isPressed = false;
-        });
-      },
+      onTapDown:
+          (_) => setState(() {
+            _scale = 0.9;
+            _isPressed = true;
+          }),
+      onTapUp:
+          (_) => setState(() {
+            _scale = 1.0;
+            _isPressed = false;
+          }),
+      onTapCancel:
+          () => setState(() {
+            _scale = 1.0;
+            _isPressed = false;
+          }),
       child: AnimatedScale(
         scale: _scale,
         duration: const Duration(milliseconds: 100),

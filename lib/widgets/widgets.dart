@@ -4,6 +4,7 @@ export "custom_container.dart";
 export "disk_widget.dart";
 export "game_controls.dart";
 export "lose_dialog.dart";
+export "rules_dialog.dart";
 export "stats_panel.dart";
 export "tower_widget.dart";
 export "win_dialog.dart";
