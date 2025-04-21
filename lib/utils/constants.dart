@@ -58,4 +58,7 @@ The **$appName** is a classic puzzle game where the goal is to move all disks fr
 3. Solve the puzzle to win!
 
 Enjoy the game and challenge yourself!
+---
+# About the Developer
+**$appName** is developed by **Boss Mophe**, a passionate developer dedicated to creating engaging and educational games. The game is designed to provide a fun and challenging experience for players of all ages.
 """;
