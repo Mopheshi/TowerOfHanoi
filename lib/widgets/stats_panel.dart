@@ -99,7 +99,9 @@ class _StatsPanelState extends ConsumerState<StatsPanel> {
           ),
         ],
       ),
-      child: Padding(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: BouncingScrollPhysics(),
         padding: const EdgeInsets.all(16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

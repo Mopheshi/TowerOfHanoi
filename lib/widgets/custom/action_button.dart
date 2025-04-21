@@ -81,16 +81,21 @@ class _ActionButtonState extends State<ActionButton> {
                   horizontal: 16,
                   vertical: 12,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(widget.icon, size: 30, color: Colors.white),
-                    w8,
-                    Text(
-                      widget.label,
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(widget.icon, size: 30, color: Colors.white),
+                      w8,
+                      Text(
+                        widget.label,
+                        style: Theme.of(context).textTheme.displaySmall,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
