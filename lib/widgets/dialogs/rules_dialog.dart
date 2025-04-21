@@ -24,7 +24,7 @@ class RulesDialog extends ConsumerWidget {
               Row(
                 children: [
                   Image.asset(appIcon, width: 50, height: 50),
-                  h16,
+                  w16,
                   Text(
                     'Game Rules',
                     style: Theme.of(context).textTheme.headlineLarge,
