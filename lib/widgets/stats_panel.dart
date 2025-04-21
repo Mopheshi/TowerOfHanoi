@@ -31,8 +31,11 @@ class _StatsPanelState extends ConsumerState<StatsPanel> {
 
   void _setupTimerListener() {
     ref.listenManual(gameProvider, (previous, next) {
-      if (next.isPlaying && _timer == null) _startTimer();
-      else if (!next.isPlaying && _timer != null) _stopTimer();
+      if (next.isPlaying && _timer == null) {
+        _startTimer();
+      } else if (!next.isPlaying && _timer != null) {
+        _stopTimer();
+      }
     });
   }
 
@@ -142,16 +145,14 @@ class _StatsPanelState extends ConsumerState<StatsPanel> {
               (context, animatedColor, child) =>
                   Icon(icon, color: animatedColor, size: 30),
         ),
-        const SizedBox(height: 4),
+        h4,
         Text(
           label,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             color: Colors.white.withAlpha(204),
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 2),
+        h2,
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -160,14 +161,7 @@ class _StatsPanelState extends ConsumerState<StatsPanel> {
             color: color.withAlpha(51),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
+          child: Text(value, style: Theme.of(context).textTheme.headlineMedium),
         ),
       ],
     );

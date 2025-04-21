@@ -20,7 +20,7 @@ class GameControls extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildDiskCountSelector(gameState, gameNotifier),
-              const SizedBox(height: 16),
+              h16,
               _buildActionButtons(gameState, gameNotifier, context),
             ],
           );
@@ -29,7 +29,7 @@ class GameControls extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildDiskCountSelector(gameState, gameNotifier),
-              const SizedBox(height: 16),
+              h16,
               _buildActionButtons(gameState, gameNotifier, context),
             ],
           );
@@ -53,7 +53,7 @@ class GameControls extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(width: 16),
+        w16,
         CircleButton(
           icon: Icons.remove_rounded,
           onPressed:
@@ -104,7 +104,7 @@ class GameControls extends ConsumerWidget {
             onPressed: () => gameNotifier.resetGame(),
             backgroundColor: Colours.orangeColor,
           ),
-          const SizedBox(width: 16),
+          w16,
           ActionButton(
             label: 'Auto Solve',
             icon: Icons.auto_awesome_rounded,

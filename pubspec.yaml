@@ -3,7 +3,7 @@ description: "Tower of Hanoi mobile game... Strictly for game development practi
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 1.0.0-Beta+1
 
 environment:
   sdk: ^3.7.0
@@ -20,6 +20,7 @@ dependencies:
   audio_session: ^0.2.0
   shared_preferences: ^2.5.3
   flutter_markdown: ^0.7.7
+  package_info_plus: ^8.3.0
 
 dev_dependencies:
   flutter_test:
@@ -32,4 +33,5 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/images/
     - assets/sounds/

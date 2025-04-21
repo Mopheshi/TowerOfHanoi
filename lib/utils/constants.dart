@@ -1,7 +1,6 @@
 const String appName = "Tower of Hanoi";
 
-// const String assetsPath = "assets/";
-// const String soundsPath = "sounds/";
+const String imagesPath = "assets/images/";
 const String soundsPath = "assets/sounds/";
 
 // Sound assets
@@ -15,15 +14,18 @@ const String clickSound = "${soundsPath}click.mp3";
 const String lostSound = "${soundsPath}lost.mp3";
 const String backgroundMusic = "${soundsPath}background_music.mp3";
 
+// Image assets
+const String appIcon = "${imagesPath}ic_launcher.png";
+
 // Constants
 const int minDiskCount = 3;
 const int maxDiskCount = 7;
 
-// Game Rules
-const String gameRules = '''
+// Game Strings
+const String gameRules = """
 # How to Play
 ---
-## Tower of Hanoi
+## $appName
 ---
 **Objective**:  
 Move all disks from the first tower to the second or third tower.
@@ -35,4 +37,25 @@ Move all disks from the first tower to the second or third tower.
 5. **Auto-Solve:** Hit the "Auto Solve" button to see the solution in action.
 6. **Reset:** Tap "Reset" to restart with the same disk count.
 7. **Adjust Difficulty:** Use "+" and "-" buttons to change the number of disks.
-''';
+""";
+
+const String aboutApp = """
+# About $appName
+---
+## What is $appName?
+The **$appName** is a classic puzzle game where the goal is to move all disks from one tower to another, following specific rules.
+
+## Features
+- Interactive gameplay
+- Auto-solve functionality
+- Adjustable difficulty
+- Performance tracking
+- Immersive audio
+
+## How to Play
+1. Move disks one at a time.
+2. Follow the rules: larger disks cannot be placed on smaller ones.
+3. Solve the puzzle to win!
+
+Enjoy the game and challenge yourself!
+""";

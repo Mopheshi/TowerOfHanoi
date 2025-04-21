@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/colours.dart';
+import '../../utils/utils.dart';
 
 class ActionButton extends StatefulWidget {
   final String label;
@@ -85,14 +85,10 @@ class _ActionButtonState extends State<ActionButton> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(widget.icon, size: 30, color: Colors.white),
-                    const SizedBox(width: 8),
+                    w8,
                     Text(
                       widget.label,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      style: Theme.of(context).textTheme.displaySmall,
                     ),
                   ],
                 ),

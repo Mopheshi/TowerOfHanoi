@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/game_provider.dart';
-import '../utils/utils.dart';
-import 'widgets.dart';
+import '../../providers/game_provider.dart';
+import '../../utils/utils.dart';
+import '../widgets.dart';
 
 class LoseDialog extends ConsumerStatefulWidget {
   const LoseDialog({super.key});
@@ -34,7 +34,7 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       backgroundColor: Colors.transparent,
       elevation: 20,
-      child: CustomContainer(
+      child: GradientContainer(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(24),
@@ -45,47 +45,43 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
                 scale: _isExpanded ? 1.5 : 1.0,
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOutBack,
-                // child: Icon(Icons.error_rounded, color: Colors.red, size: 64),
-                child: Text(
-                  '😢',
-                  style: const TextStyle(fontSize: 64, color: Colors.red),
-                ),
+                child: Text('😢', style: const TextStyle(fontSize: 64)),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              h16,
+              Text(
                 "Time's Up!",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
+                style: Theme.of(context).textTheme.displayMedium,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              h8,
               Text(
                 'You ran out of time!',
-                style: TextStyle(
-                  fontSize: 18,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: Colors.white.withAlpha(204),
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
-              _buildStatRow('Disks', '${gameState.diskCount}'),
-              _buildStatRow('Moves', '${gameState.moves}'),
-              _buildStatRow('Time Limit', gameState.timeLimit.formatTime()),
-              _buildStatRow('Time Spent', gameState.timeSpent.formatTime()),
-              const SizedBox(height: 24),
+              h24,
+              StatRow(label: 'Disks', value: '${gameState.diskCount}'),
+              StatRow(label: 'Moves', value: '${gameState.moves}'),
+              StatRow(
+                label: 'Time Limit',
+                value: gameState.timeLimit.formatTime(),
+              ),
+              StatRow(
+                label: 'Time Spent',
+                value: gameState.timeSpent.formatTime(),
+              ),
+              h24,
               Text(
                 'Try again with less disks or more time!',
-                style: TextStyle(
-                  fontSize: 18,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontStyle: FontStyle.italic,
                   color: Colors.white.withAlpha(204),
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              h24,
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -102,7 +98,7 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
                         Navigator.of(context).pop();
                       },
                     ),
-                    const SizedBox(width: 16),
+                    h16,
                     ActionButton(
                       icon: Icons.auto_awesome_rounded,
                       label: 'Auto Solve',
@@ -118,29 +114,6 @@ class _LoseDialogState extends ConsumerState<LoseDialog>
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 20, color: Colors.white.withAlpha(204)),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/game_provider.dart';
-import '../utils/utils.dart';
-import 'widgets.dart';
+import '../../providers/game_provider.dart';
+import '../../utils/utils.dart';
+import '../widgets.dart';
 
 class WinDialog extends ConsumerStatefulWidget {
   const WinDialog({super.key});
@@ -34,7 +34,7 @@ class _WinDialogState extends ConsumerState<WinDialog>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       backgroundColor: Colors.transparent,
       elevation: 20,
-      child: CustomContainer(
+      child: GradientContainer(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(24),
@@ -51,31 +51,35 @@ class _WinDialogState extends ConsumerState<WinDialog>
                   size: 64,
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              h16,
+              Text(
                 'Congratulations!',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: Theme.of(context).textTheme.displayMedium,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              h8,
               Text(
                 'You solved the puzzle!',
-                style: TextStyle(
-                  fontSize: 18,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: Colors.white.withAlpha(204),
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
-              _buildStatRow('Moves', '${gameState.moves}'),
-              _buildStatRow('Minimum Moves', '${gameState.minimumMoves}'),
-              _buildStatRow('Time Limit', gameState.timeLimit.formatTime()),
-              _buildStatRow('Time Spent', gameState.timeSpent.formatTime()),
-              const SizedBox(height: 24),
+              h24,
+              StatRow(label: 'Moves', value: '${gameState.moves}'),
+              StatRow(
+                label: 'Minimum Moves',
+                value: '${gameState.minimumMoves}',
+              ),
+              StatRow(
+                label: 'Time Limit',
+                value: gameState.timeLimit.formatTime(),
+              ),
+              StatRow(
+                label: 'Time Spent',
+                value: gameState.timeSpent.formatTime(),
+              ),
+              h24,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -93,29 +97,6 @@ class _WinDialogState extends ConsumerState<WinDialog>
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 20, color: Colors.white.withAlpha(204)),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ],
       ),
     );
   }

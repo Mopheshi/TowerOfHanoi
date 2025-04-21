@@ -68,39 +68,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            iconSize: 30,
-            tooltip: gameState.isMusicPlaying ? 'Stop Music' : 'Play Music',
-            icon: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder:
-                  (child, animation) =>
-                      ScaleTransition(scale: animation, child: child),
-              child:
-                  gameState.isMusicPlaying
-                      ? const Icon(
-                        Icons.music_note_rounded,
-                        key: ValueKey('playing'),
-                      )
-                      : const Icon(
-                        Icons.music_off_rounded,
-                        key: ValueKey('stopped'),
-                      ),
-            ),
-            onPressed: () {
-              final newMusicState = !gameState.isMusicPlaying;
-
-              ref.read(gameProvider.notifier).toggleMusicState(newMusicState);
-
-              if (newMusicState) {
-                GameAudioPlayer.playBackgroundMusic();
-              } else {
-                GameAudioPlayer.pauseBackgroundMusic();
-              }
-            },
-          ),
-        ],
+        actions: [MusicToggle(), AboutIcon()],
       ),
       body: SafeArea(
         child:
@@ -125,7 +93,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: GameControls(),
         ),
-        const SizedBox(height: 16),
+        h16,
       ],
     );
   }
