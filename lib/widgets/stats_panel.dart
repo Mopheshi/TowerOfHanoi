@@ -99,30 +99,34 @@ class _StatsPanelState extends ConsumerState<StatsPanel> {
           ),
         ],
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildStatItem(
-              label: 'Moves',
-              value: '${gameState.moves}',
-              icon: Icons.swap_horiz_rounded,
-              color: Colors.blue,
+            Flexible(
+              child: _buildStatItem(
+                label: 'Moves',
+                value: '${gameState.moves}',
+                icon: Icons.swap_horiz_rounded,
+                color: Colors.blue,
+              ),
             ),
-            _buildStatItem(
-              label: 'Min Moves',
-              value: '${gameState.minimumMoves}',
-              icon: Icons.trending_down_rounded,
-              color: Colors.orange,
+            Flexible(
+              child: _buildStatItem(
+                label: 'Min Moves',
+                value: '${gameState.minimumMoves}',
+                icon: Icons.trending_down_rounded,
+                color: Colors.orange,
+              ),
             ),
-            _buildStatItem(
-              label: 'Time Left',
-              value: displayTime.formatTime(),
-              icon: Icons.hourglass_bottom_rounded,
-              color: timeColor,
+            Flexible(
+              child: _buildStatItem(
+                label: 'Time Left',
+                value: displayTime.formatTime(),
+                icon: Icons.hourglass_bottom_rounded,
+                color: timeColor,
+              ),
             ),
           ],
         ),
